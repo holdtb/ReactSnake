@@ -1,3 +1,5 @@
+import { Cell, Direction } from './Types';
+
 export default class SnakeStore {
     board: Array<Array<Cell>> = [];
     snake: Array<Cell> = [];
@@ -43,16 +45,4 @@ export default class SnakeStore {
             this.board.push(row);
         }
     }
-}
-
-type Cell = {
-    x: number;
-    y: number;
-};
-
-export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right
 }

@@ -14,20 +14,18 @@ export default class Snake extends Component<{}, State> {
     }
 
     getBoard() {
-        return this.state.store.board.map(row => {
-            return row.map(col => {
-                return (
-                    <div
-                        key={col.x + ',' + col.y}
-                        style={{
-                            display: 'inline-block',
-                            border: '1px solid',
-                            overflow: 'hidden'
-                        }}>
-                    </div>
-                );
-            });
-        });
+        return this.state.store.board.map(row =>
+            row.map(col => (
+                <div
+                    key={col.x + ',' + col.y}
+                    style={{
+                        display: 'inline-block',
+                        border: '1px solid',
+                        overflow: 'hidden'
+                    }}
+                />
+            ))
+        );
     }
 
     render() {

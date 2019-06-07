@@ -1,4 +1,5 @@
-import SnakeStore, { Direction } from "./SnakeStore";
+import SnakeStore from "./SnakeStore";
+import { Direction } from "./Types";
 
 describe('Initialization', () => {
     it('Board has a grid with correct size', () => {
