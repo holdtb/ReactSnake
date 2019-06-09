@@ -7,10 +7,19 @@ export default class SnakeStore {
     @observable direction: Direction = Direction.Right;
     @observable isPaused: boolean = false;
     @observable score: number = 0;
+    @observable food: Cell;
 
     constructor(width: number, height: number) {
         this.board = this.getEmptyBoard(width, height);
         this.snake = this.initializeSnake(width, height);
+        this.food = this.generateFood();
+    }
+
+    private generateFood(): Cell {
+        const x = Math.floor((Math.random() * this.board.length) + 1);
+        const y = Math.floor((Math.random() * this.board[0].length) + 1);
+        const res = { x, y };
+        return res;
     }
 
     public move(): boolean {
@@ -32,7 +41,17 @@ export default class SnakeStore {
                 break;
         }
 
+        this.checkForFood(this.snake[0]);
+
         return this.checkForOutOfBounds(this.snake[0]);
+    }
+
+    private checkForFood(snakeHead: Cell) {
+        if (snakeHead.x === this.food.x && snakeHead.y === this.food.y) {
+            console.log('Food eaten...');
+            this.score++;
+            this.food = this.generateFood();
+        }
     }
 
     private checkForOutOfBounds(snakeHead: Cell) {

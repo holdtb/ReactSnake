@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SnakeStore from '../lib/SnakeStore';
 import { Cell, Keys, Direction } from '../lib/Types';
 import { observer } from 'mobx-react';
+import { pathToFileURL } from 'url';
 
 interface Props {
   store: SnakeStore;
@@ -35,7 +36,7 @@ export default class Snake extends Component<Props, {}> {
       if (!alive) {
         console.log('DEAD');
       }
-    }, 1000);
+    }, 700);
   }
 
   getStyle(cell: Cell) {
@@ -47,6 +48,8 @@ export default class Snake extends Component<Props, {}> {
     };
     if (this.props.store.snake.find(pt => pt.x === cell.x && pt.y === cell.y)) {
       return { ...style, background: 'blue' };
+    } else if (this.props.store.food.x === cell.x && this.props.store.food.y === cell.y) {
+      return { ...style, background: 'magenta' };
     } else return style;
   }
 

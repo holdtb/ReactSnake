@@ -125,3 +125,36 @@ describe('Edge detection', () => {
         expect(alive).toBeFalsy();
     });
 });
+
+describe('Food', () => {
+    it('Places food at random location', () => {
+        const store = new SnakeStore(4, 4);
+
+        expect(store.food).toBeTruthy();
+    });
+
+    it('Increments score when eating food', () => {
+        const store = new SnakeStore(4, 4);
+        store.food = { x: 1, y: 1 };
+        store.snake = [{ x: 2, y: 1 }];
+        store.direction = Direction.Left;
+
+        store.move();
+
+        expect(store.score).toBe(1);
+    });
+
+    it.only('Generates new food when eating food', () => {
+        const store = new SnakeStore(4, 4);
+        const startingFood = { x: 1, y: 1 }
+        store.food = startingFood;
+        store.snake = [{ x: 2, y: 1 }];
+        store.direction = Direction.Left;
+
+        store.move();
+
+        console.log({ ...store.food });
+        expect({ ...store.food }).not.toEqual(startingFood);
+
+    });
+});

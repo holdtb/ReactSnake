@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 
-const Score = ({ score }) => (
-  <span
-    style={{
-      display: 'inline-block',
-      marginTop: '5px',
-      padding: '5px',
-      backgroundColor: 'green',
-      color: 'white'
-    }}>
-    Score: {score}
-  </span>
-);
+interface Props {
+  score: number;
+}
 
-export default Score;
+@observer
+export default class Score extends Component<Props, {}> {
+  render() {
+    return (
+      <span
+        style={{
+          display: 'inline-block',
+          marginTop: '5px',
+          padding: '5px',
+          backgroundColor: 'green',
+          color: 'white'
+        }}>
+        Score: {this.props.score}
+      </span>
+    );
+  }
+}

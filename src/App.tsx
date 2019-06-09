@@ -18,10 +18,11 @@ class App extends Component<{}, State> {
   }
 
   render() {
+    const store = this.state.store;
     return (
       <div id="snake">
-        <Stats isPaused={this.state.store.isPaused} score={0} />
-        <Snake store={this.state.store} />
+        <Stats isPaused={store.isPaused} score={store.score} />
+        <Snake store={store} />
       </div>
     );
   }
