@@ -8,58 +8,76 @@ export default class SnakeStore {
     @observable isPaused: boolean = false;
     @observable score: number = 0;
     @observable food: Cell;
+    intervalId?: NodeJS.Timeout;
+    @observable dead: boolean = false;
 
     constructor(width: number, height: number) {
         this.board = this.getEmptyBoard(width, height);
         this.snake = this.initializeSnake(width, height);
         this.food = this.generateFood();
+
+        this.setMoveLoop();
+    }
+
+    private setMoveLoop() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId)
+        }
+        this.intervalId = setInterval(() => {
+            this.move();
+        }, 500 - (this.score * 50));
+    }
+
+    private randomnumber(minimum: number, maximum: number): number {
+        return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
     }
 
     private generateFood(): Cell {
-        const x = Math.floor((Math.random() * this.board.length) + 1);
-        const y = Math.floor((Math.random() * this.board[0].length) + 1);
+        const x = this.randomnumber(0, this.board.length - 1);
+        const y = this.randomnumber(0, this.board[0].length - 1);
         const res = { x, y };
         return res;
     }
 
-    public move(): boolean {
-        if (this.isPaused) return true;
+    move(): void {
+        if (this.isPaused) return;
 
-        let snakeHead = this.snake[0];
+        const snakeHead = this.snake[0];
         switch (this.direction) {
             case Direction.Right:
-                this.snake[0] = { ...snakeHead, x: snakeHead.x + 1 };
+                this.snake = [{ ...snakeHead, x: snakeHead.x + 1 }, ...this.snake.slice(0, this.snake.length - 1)];
                 break;
             case Direction.Left:
-                this.snake[0] = { ...snakeHead, x: snakeHead.x - 1 };
+                this.snake = [{ ...snakeHead, x: snakeHead.x - 1 }, ...this.snake.slice(0, this.snake.length - 1)];
                 break;
             case Direction.Up:
-                this.snake[0] = { ...snakeHead, y: snakeHead.y - 1 };
+                this.snake = [{ ...snakeHead, y: snakeHead.y - 1 }, ...this.snake.slice(0, this.snake.length - 1)];
                 break;
             case Direction.Down:
-                this.snake[0] = { ...snakeHead, y: snakeHead.y + 1 };
+                this.snake = [{ ...snakeHead, y: snakeHead.y + 1 }, ...this.snake.slice(0, this.snake.length - 1)];
                 break;
         }
 
-        this.checkForFood(this.snake[0]);
+        this.checkForFood(this.snake[0], snakeHead);
 
-        return this.checkForOutOfBounds(this.snake[0]);
+        this.dead = this.checkForOutOfBounds(this.snake[0]);
     }
 
-    private checkForFood(snakeHead: Cell) {
+    private checkForFood(snakeHead: Cell, priorHead: Cell): void {
         if (snakeHead.x === this.food.x && snakeHead.y === this.food.y) {
-            console.log('Food eaten...');
             this.score++;
+            this.snake = [...this.snake, priorHead];
             this.food = this.generateFood();
+            this.setMoveLoop();
         }
     }
 
-    private checkForOutOfBounds(snakeHead: Cell) {
-        if (snakeHead.x > this.board[0].length - 1) return false;
-        if (snakeHead.x < 0) return false;
-        if (snakeHead.y > this.board.length - 1) return false;
-        if (snakeHead.y < 0) return false;
-        return true;
+    private checkForOutOfBounds(snakeHead: Cell): boolean {
+        if (snakeHead.x > this.board[0].length - 1) return true;
+        if (snakeHead.x < 0) return true;
+        if (snakeHead.y > this.board.length - 1) return true;
+        if (snakeHead.y < 0) return true;
+        return false;
     }
 
     private initializeSnake(width: number, height: number): Cell[] {

@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import SnakeStore from '../lib/SnakeStore';
 import { Cell, Keys, Direction } from '../lib/Types';
 import { observer } from 'mobx-react';
-import { pathToFileURL } from 'url';
+import Death from './Death';
 
 interface Props {
   store: SnakeStore;
+  onRestart: Function;
 }
 
 @observer
@@ -31,12 +32,6 @@ export default class Snake extends Component<Props, {}> {
           break;
       }
     });
-    setInterval(() => {
-      const alive = this.props.store.move();
-      if (!alive) {
-        console.log('DEAD');
-      }
-    }, 700);
   }
 
   getStyle(cell: Cell) {
@@ -46,6 +41,10 @@ export default class Snake extends Component<Props, {}> {
       overflow: 'hidden',
       fontSize: '9px'
     };
+
+    const head = this.props.store.snake[0];
+    const isHead = head.x === cell.x && head.y === cell.y;
+    if (isHead) return { ...style, background: 'yellow' };
     if (this.props.store.snake.find(pt => pt.x === cell.x && pt.y === cell.y)) {
       return { ...style, background: 'blue' };
     } else if (this.props.store.food.x === cell.x && this.props.store.food.y === cell.y) {
@@ -63,6 +62,23 @@ export default class Snake extends Component<Props, {}> {
   }
 
   render() {
+    const content = this.props.store.dead ? (
+      <Death onRestart={this.props.onRestart} />
+    ) : (
+      <div
+        id="board"
+        style={{
+          width: 600,
+          height: 600,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(20, 1fr)',
+          gridTemplateRows: 'repeat(20, 1fr)',
+          gridGap: 0,
+          background: 'lightGreen'
+        }}>
+        {this.getBoard()}
+      </div>
+    );
     return (
       <div
         id="game"
@@ -79,19 +95,7 @@ export default class Snake extends Component<Props, {}> {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-          <div
-            id="board"
-            style={{
-              width: 600,
-              height: 600,
-              display: 'grid',
-              gridTemplateColumns: 'repeat(30, 1fr)',
-              gridTemplateRows: 'repeat(30, 1fr)',
-              gridGap: 0,
-              background: 'lightGreen'
-            }}>
-            {this.getBoard()}
-          </div>
+          {content}
         </div>
       </div>
     );

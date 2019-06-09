@@ -94,8 +94,8 @@ describe('Edge detection', () => {
         store = new SnakeStore(4, 4);
         store.snake = [{ x: 3, y: 0 }];
         store.direction = Direction.Up;
-        const alive = store.move();
-        expect(alive).toBeFalsy();
+        store.move();
+        expect(store.dead).toBeTruthy();
     });
 
     it('Detects DOWN hit into wall', () => {
@@ -103,8 +103,8 @@ describe('Edge detection', () => {
         store.snake = [{ x: 2, y: 3 }];
         store.direction = Direction.Down;
 
-        const alive = store.move();
-        expect(alive).toBeFalsy();
+        store.move();
+        expect(store.dead).toBeTruthy();
     });
 
     it('Detects LEFT hit into wall', () => {
@@ -112,8 +112,8 @@ describe('Edge detection', () => {
         store.snake = [{ x: 0, y: 1 }];
         store.direction = Direction.Left;
 
-        const alive = store.move();
-        expect(alive).toBeFalsy();
+        store.move();
+        expect(store.dead).toBeTruthy();
     });
 
     it('Detects RIGHT hit into wall', () => {
@@ -121,40 +121,48 @@ describe('Edge detection', () => {
         store.snake = [{ x: 3, y: 2 }];
         store.direction = Direction.Right;
 
-        const alive = store.move();
-        expect(alive).toBeFalsy();
+        store.move();
+        expect(store.dead).toBeTruthy();
     });
 });
 
 describe('Food', () => {
-    it('Places food at random location', () => {
-        const store = new SnakeStore(4, 4);
+    let store: SnakeStore;
+    beforeEach(() => {
+        store = new SnakeStore(4, 4);
+        store.food = { x: 1, y: 1 };
+        store.snake = [{ x: 2, y: 1 }];
+        store.direction = Direction.Left;
+    });
 
+    it('Places food at random location', () => {
         expect(store.food).toBeTruthy();
     });
 
     it('Increments score when eating food', () => {
-        const store = new SnakeStore(4, 4);
-        store.food = { x: 1, y: 1 };
-        store.snake = [{ x: 2, y: 1 }];
-        store.direction = Direction.Left;
-
         store.move();
 
         expect(store.score).toBe(1);
     });
 
-    it.only('Generates new food when eating food', () => {
-        const store = new SnakeStore(4, 4);
+    it('Adds cell to snake when eating', () => {
+        store.move();
+
+        //snake was at 2, 1 so after moving left, he will be at 1, 1
+        let expectedSnake: Cell[] = [{ x: 1, y: 1 }, { x: 2, y: 1 }];
+        expect(store.snake.slice()).toEqual(expectedSnake);
+
+        store.move();
+        expectedSnake = [{ x: 0, y: 1 }, { x: 1, y: 1 }];
+        expect(store.snake.slice()).toEqual(expectedSnake);
+    });
+
+    it('Generates new food when eating food', () => {
         const startingFood = { x: 1, y: 1 }
         store.food = startingFood;
-        store.snake = [{ x: 2, y: 1 }];
-        store.direction = Direction.Left;
 
         store.move();
 
-        console.log({ ...store.food });
         expect({ ...store.food }).not.toEqual(startingFood);
-
     });
 });

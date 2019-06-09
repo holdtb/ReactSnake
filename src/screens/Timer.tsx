@@ -35,7 +35,6 @@ export const Timer = ({ pause }) => {
   useInterval(
     () => {
       if (pause) {
-        //resetRef.current = true;
         return;
       }
       resetRef.current = false;
@@ -47,7 +46,6 @@ export const Timer = ({ pause }) => {
   useInterval(
     () => {
       if (pause) {
-        //resetRef.current = true;
         return;
       }
       resetRef.current = false;
@@ -60,7 +58,6 @@ export const Timer = ({ pause }) => {
   useInterval(
     () => {
       if (pause) {
-        //resetRef.current = true;
         return;
       }
       setSeconds(0);

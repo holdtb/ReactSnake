@@ -13,8 +13,15 @@ class App extends Component<{}, State> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      store: new SnakeStore(30, 30)
+      store: new SnakeStore(20, 20)
     };
+    this.handleRestart = this.handleRestart.bind(this);
+  }
+
+  handleRestart() {
+    this.setState({
+      store: new SnakeStore(20, 20)
+    });
   }
 
   render() {
@@ -22,7 +29,7 @@ class App extends Component<{}, State> {
     return (
       <div id="snake">
         <Stats isPaused={store.isPaused} score={store.score} />
-        <Snake store={store} />
+        <Snake store={store} onRestart={this.handleRestart} />
       </div>
     );
   }
