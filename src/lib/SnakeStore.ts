@@ -1,17 +1,22 @@
 import { Cell, Direction } from './Types';
+import { observable } from 'mobx';
 
 export default class SnakeStore {
     board: Array<Array<Cell>> = [];
-    snake: Array<Cell> = [];
-    direction: Direction = Direction.Right;
+    @observable snake: Array<Cell> = [];
+    @observable direction: Direction = Direction.Right;
+    @observable isPaused: boolean = false;
+    @observable score: number = 0;
 
     constructor(width: number, height: number) {
-        this.initializeBoard(width, height);
+        this.board = this.getEmptyBoard(width, height);
         this.snake = this.initializeSnake(width, height);
     }
 
-    public move(): void {
-        const snakeHead = this.snake[0];
+    public move(): boolean {
+        if (this.isPaused) return true;
+
+        let snakeHead = this.snake[0];
         switch (this.direction) {
             case Direction.Right:
                 this.snake[0] = { ...snakeHead, x: snakeHead.x + 1 };
@@ -20,12 +25,22 @@ export default class SnakeStore {
                 this.snake[0] = { ...snakeHead, x: snakeHead.x - 1 };
                 break;
             case Direction.Up:
-                this.snake[0] = { ...snakeHead, y: snakeHead.y + 1 };
-                break;
-            case Direction.Down:
                 this.snake[0] = { ...snakeHead, y: snakeHead.y - 1 };
                 break;
+            case Direction.Down:
+                this.snake[0] = { ...snakeHead, y: snakeHead.y + 1 };
+                break;
         }
+
+        return this.checkForOutOfBounds(this.snake[0]);
+    }
+
+    private checkForOutOfBounds(snakeHead: Cell) {
+        if (snakeHead.x > this.board[0].length - 1) return false;
+        if (snakeHead.x < 0) return false;
+        if (snakeHead.y > this.board.length - 1) return false;
+        if (snakeHead.y < 0) return false;
+        return true;
     }
 
     private initializeSnake(width: number, height: number): Cell[] {
@@ -36,13 +51,15 @@ export default class SnakeStore {
         return snake;
     }
 
-    private initializeBoard(width: number, height: number) {
-        for (let i = 0; i < width; i++) {
+    private getEmptyBoard(width: number, height: number) {
+        const board: Array<Array<Cell>> = [];
+        for (let i = 0; i < height; i++) {
             const row: Array<Cell> = [];
-            for (let j = 0; j < height; j++) {
-                row.push({ x: i, y: j });
+            for (let j = 0; j < width; j++) {
+                row.push({ x: j, y: i });
             }
-            this.board.push(row);
+            board.push(row);
         }
+        return board;
     }
 }

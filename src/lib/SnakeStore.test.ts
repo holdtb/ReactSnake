@@ -1,5 +1,6 @@
 import SnakeStore from "./SnakeStore";
-import { Direction } from "./Types";
+import { Direction, Cell } from "./Types";
+
 
 describe('Initialization', () => {
     it('Board has a grid with correct size', () => {
@@ -9,14 +10,29 @@ describe('Initialization', () => {
         expect(store.board[0].length).toBe(5);
     });
 
+    it('Has a score of zero', () => {
+        const store = new SnakeStore(5, 5);
+
+        expect(store.score).toBe(0);
+    });
+
     it('Puts the snake in the middle of the board to start - Odd grid size', () => {
         const store = new SnakeStore(5, 5);
-        expect(store.snake).toEqual([{x: 2, y: 2}]);
+        const expected: Cell[] = [{ x: 2, y: 2 }];
+        expect(store.snake.slice()).toEqual(expected);
     });
 
     it('Puts the snake in the middle of the board to start - Even grid size', () => {
         const store = new SnakeStore(6, 6);
-        expect(store.snake).toEqual([{x: 3, y: 3}])
+        expect(store.snake.slice()).toEqual([{ x: 3, y: 3 }])
+    });
+
+    it('Game is paused then move is ignored', () => {
+        const store = new SnakeStore(5, 5);
+        store.isPaused = true;
+        const startingPosition = store.snake.slice();
+        store.move();
+        expect(store.snake.slice()).toEqual(startingPosition);
     });
 });
 
@@ -57,7 +73,7 @@ describe('Basic Movement', () => {
 
         const endingPosition = store.snake[0];
         expect(endingPosition.x).toBe(startingPosition.x);
-        expect(endingPosition.y).toBe(startingPosition.y + 1);
+        expect(endingPosition.y).toBe(startingPosition.y - 1);
     });
 
     it('Movement DOWN', () => {
@@ -67,6 +83,45 @@ describe('Basic Movement', () => {
 
         const endingPosition = store.snake[0];
         expect(endingPosition.x).toBe(startingPosition.x);
-        expect(endingPosition.y).toBe(startingPosition.y - 1);
+        expect(endingPosition.y).toBe(startingPosition.y + 1);
+    });
+});
+
+describe('Edge detection', () => {
+    let store: SnakeStore;
+
+    it('Detects UP hit into wall', () => {
+        store = new SnakeStore(4, 4);
+        store.snake = [{ x: 3, y: 0 }];
+        store.direction = Direction.Up;
+        const alive = store.move();
+        expect(alive).toBeFalsy();
+    });
+
+    it('Detects DOWN hit into wall', () => {
+        store = new SnakeStore(4, 4);
+        store.snake = [{ x: 2, y: 3 }];
+        store.direction = Direction.Down;
+
+        const alive = store.move();
+        expect(alive).toBeFalsy();
+    });
+
+    it('Detects LEFT hit into wall', () => {
+        store = new SnakeStore(4, 4);
+        store.snake = [{ x: 0, y: 1 }];
+        store.direction = Direction.Left;
+
+        const alive = store.move();
+        expect(alive).toBeFalsy();
+    });
+
+    it('Detects RIGHT hit into wall', () => {
+        store = new SnakeStore(4, 4);
+        store.snake = [{ x: 3, y: 2 }];
+        store.direction = Direction.Right;
+
+        const alive = store.move();
+        expect(alive).toBeFalsy();
     });
 });
