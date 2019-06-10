@@ -62,23 +62,6 @@ export default class Snake extends Component<Props, {}> {
   }
 
   render() {
-    const content = this.props.store.dead ? (
-      <Death onRestart={this.props.onRestart} />
-    ) : (
-      <div
-        id="board"
-        style={{
-          width: 600,
-          height: 600,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(20, 1fr)',
-          gridTemplateRows: 'repeat(20, 1fr)',
-          gridGap: 0,
-          background: 'lightGreen'
-        }}>
-        {this.getBoard()}
-      </div>
-    );
     return (
       <div
         id="game"
@@ -95,7 +78,20 @@ export default class Snake extends Component<Props, {}> {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-          {content}
+          <div
+            id="board"
+            style={{
+              width: 600,
+              height: 600,
+              display: 'grid',
+              gridTemplateColumns: `repeat(${this.props.store.width}, 1fr)`,
+              gridTemplateRows: `repeat(${this.props.store.height}, 1fr)`,
+              gridGap: 0,
+              background: 'lightGreen'
+            }}>
+            {this.getBoard()}
+            {this.props.store.dead ? <Death onRestart={this.props.onRestart} /> : null}
+          </div>
         </div>
       </div>
     );

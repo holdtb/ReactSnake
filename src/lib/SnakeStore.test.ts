@@ -90,37 +90,51 @@ describe('Basic Movement', () => {
 describe('Edge detection', () => {
     let store: SnakeStore;
 
-    it('Detects UP hit into wall', () => {
+    it('UP hit into wall wraps to bottom side', () => {
         store = new SnakeStore(4, 4);
         store.snake = [{ x: 3, y: 0 }];
         store.direction = Direction.Up;
         store.move();
-        expect(store.dead).toBeTruthy();
+        expect(store.dead).toBeFalsy();
+        expect(store.snake.slice()).toEqual([{ x: 3, y: 3 }]);
     });
 
-    it('Detects DOWN hit into wall', () => {
+    it('DOWN hit into wall wraps to top side', () => {
         store = new SnakeStore(4, 4);
         store.snake = [{ x: 2, y: 3 }];
         store.direction = Direction.Down;
 
         store.move();
-        expect(store.dead).toBeTruthy();
+        expect(store.dead).toBeFalsy();
+        expect(store.snake.slice()).toEqual([{ x: 2, y: 0 }]);
     });
 
-    it('Detects LEFT hit into wall', () => {
+    it('LEFT hit into wall wraps to right side', () => {
         store = new SnakeStore(4, 4);
         store.snake = [{ x: 0, y: 1 }];
         store.direction = Direction.Left;
 
         store.move();
-        expect(store.dead).toBeTruthy();
+        expect(store.dead).toBeFalsy();
+        expect(store.snake.slice()).toEqual([{ x: 3, y: 1 }]);
     });
 
-    it('Detects RIGHT hit into wall', () => {
+    it('RIGHT hit into wall wraps to left side', () => {
         store = new SnakeStore(4, 4);
         store.snake = [{ x: 3, y: 2 }];
         store.direction = Direction.Right;
 
+        store.move();
+        expect(store.dead).toBeFalsy();
+        expect(store.snake.slice()).toEqual([{ x: 0, y: 2 }]);
+    });
+});
+
+describe('Snake hitting snake', () => {
+    it('UP hit into self causes death', () => {
+        const store = new SnakeStore(4, 4);
+        store.snake = [{ x: 2, y: 0 }, { x: 2, y: 1 }, { x: 2, y: 2 }, { x: 2, y: 3 }];
+        store.direction = Direction.Up;
         store.move();
         expect(store.dead).toBeTruthy();
     });

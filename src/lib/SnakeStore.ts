@@ -11,7 +11,13 @@ export default class SnakeStore {
     intervalId?: NodeJS.Timeout;
     @observable dead: boolean = false;
 
+    width: number;
+    height: number;
+
     constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+
         this.board = this.getEmptyBoard(width, height);
         this.snake = this.initializeSnake(width, height);
         this.food = this.generateFood();
@@ -25,7 +31,7 @@ export default class SnakeStore {
         }
         this.intervalId = setInterval(() => {
             this.move();
-        }, 500 - (this.score * 50));
+        }, 500 - ((this.score / 3) * 50));
     }
 
     private randomnumber(minimum: number, maximum: number): number {
@@ -33,8 +39,8 @@ export default class SnakeStore {
     }
 
     private generateFood(): Cell {
-        const x = this.randomnumber(0, this.board.length - 1);
-        const y = this.randomnumber(0, this.board[0].length - 1);
+        const x = this.randomnumber(0, this.width - 1);
+        const y = this.randomnumber(0, this.height - 1);
         const res = { x, y };
         return res;
     }
@@ -43,24 +49,47 @@ export default class SnakeStore {
         if (this.isPaused) return;
 
         const snakeHead = this.snake[0];
+        this.moveSnake(snakeHead);
+        this.checkForFood(this.snake[0], snakeHead);
+        this.checkForCrash();
+    }
+
+    private checkForCrash() {
+        const snakeHead = this.snake[0];
+        if (this.snake.find((cell, idx) => idx != 0 && cell.x === snakeHead.x && cell.y === snakeHead.y)) {
+            this.dead = true;
+            this.isPaused = true;
+        }
+    }
+
+    private moveSnake(snakeHead: Cell) {
+        const chopTail = (snake: Array<Cell>) => snake.slice(0, snake.length - 1);
         switch (this.direction) {
             case Direction.Right:
-                this.snake = [{ ...snakeHead, x: snakeHead.x + 1 }, ...this.snake.slice(0, this.snake.length - 1)];
+                if (snakeHead.x + 1 === this.width)
+                    this.snake = [{ ...snakeHead, x: 0 }, ...chopTail(this.snake)];
+                else
+                    this.snake = [{ ...snakeHead, x: snakeHead.x + 1 }, ...chopTail(this.snake)];
                 break;
             case Direction.Left:
-                this.snake = [{ ...snakeHead, x: snakeHead.x - 1 }, ...this.snake.slice(0, this.snake.length - 1)];
+                if (snakeHead.x === 0)
+                    this.snake = [{ ...snakeHead, x: this.width - 1 }, ...chopTail(this.snake)];
+                else
+                    this.snake = [{ ...snakeHead, x: snakeHead.x - 1 }, ...chopTail(this.snake)];
                 break;
             case Direction.Up:
-                this.snake = [{ ...snakeHead, y: snakeHead.y - 1 }, ...this.snake.slice(0, this.snake.length - 1)];
+                if (snakeHead.y === 0)
+                    this.snake = [{ ...snakeHead, y: this.height - 1 }, ...chopTail(this.snake)];
+                else
+                    this.snake = [{ ...snakeHead, y: snakeHead.y - 1 }, ...chopTail(this.snake)];
                 break;
             case Direction.Down:
-                this.snake = [{ ...snakeHead, y: snakeHead.y + 1 }, ...this.snake.slice(0, this.snake.length - 1)];
+                if (snakeHead.y + 1 === this.height)
+                    this.snake = [{ ...snakeHead, y: 0 }, ...chopTail(this.snake)];
+                else
+                    this.snake = [{ ...snakeHead, y: snakeHead.y + 1 }, ...chopTail(this.snake)];
                 break;
         }
-
-        this.checkForFood(this.snake[0], snakeHead);
-
-        this.dead = this.checkForOutOfBounds(this.snake[0]);
     }
 
     private checkForFood(snakeHead: Cell, priorHead: Cell): void {
@@ -70,14 +99,6 @@ export default class SnakeStore {
             this.food = this.generateFood();
             this.setMoveLoop();
         }
-    }
-
-    private checkForOutOfBounds(snakeHead: Cell): boolean {
-        if (snakeHead.x > this.board[0].length - 1) return true;
-        if (snakeHead.x < 0) return true;
-        if (snakeHead.y > this.board.length - 1) return true;
-        if (snakeHead.y < 0) return true;
-        return false;
     }
 
     private initializeSnake(width: number, height: number): Cell[] {

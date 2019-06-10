@@ -8,6 +8,8 @@ const Death = (props: Props) => {
   return (
     <div
       style={{
+        position: 'absolute',
+        opacity: 0.8,
         width: '600px',
         height: '600px',
         backgroundColor: 'lightGreen',
