@@ -3,6 +3,7 @@ import SnakeStore from '../lib/SnakeStore';
 import { Cell, Keys, Direction } from '../lib/Types';
 import { observer } from 'mobx-react';
 import Death from './Death';
+import { ReactComponent as Burger } from '../images/burger.svg';
 
 interface Props {
   store: SnakeStore;
@@ -34,7 +35,7 @@ export default class Snake extends Component<Props, {}> {
     });
   }
 
-  getStyle(cell: Cell) {
+  getStyle(cell: Cell): React.CSSProperties {
     const style = {
       display: 'inline-block',
       border: '1px solid',
@@ -47,8 +48,6 @@ export default class Snake extends Component<Props, {}> {
     if (isHead) return { ...style, background: 'yellow' };
     if (this.props.store.snake.find(pt => pt.x === cell.x && pt.y === cell.y)) {
       return { ...style, background: 'blue' };
-    } else if (this.props.store.food.x === cell.x && this.props.store.food.y === cell.y) {
-      return { ...style, background: 'magenta' };
     } else return style;
   }
 
@@ -56,6 +55,13 @@ export default class Snake extends Component<Props, {}> {
     return this.props.store.board.map(row =>
       row.map(cell => {
         const style = this.getStyle(cell);
+        if (this.props.store.food.x === cell.x && this.props.store.food.y === cell.y) {
+          return (
+            <div key={cell.x + ',' + cell.y} style={style}>
+              <Burger />
+            </div>
+          );
+        }
         return <div key={cell.x + ',' + cell.y} style={style} />;
       })
     );
